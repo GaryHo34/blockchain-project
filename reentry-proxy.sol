@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: MIT
-pragma solidity ^0.8.20;
+pragma solidity ^0.8.21;
 import "https://github.com/spherex-xyz/reentrancy-guard-proxy/blob/main/src/ReentrancyGuardTransparentUpgradeableProxy.sol";
 
 contract DepositFunds {
@@ -26,16 +26,14 @@ contract DepositFunds {
 
 contract User {
     DepositFunds public deopsitFundInterface;
-    uint8 public bal;
 
-    constructor(address _depositProxyAddress) {
+    constructor(address payable  _depositProxyAddress) {
         deopsitFundInterface = DepositFunds(_depositProxyAddress);
     }
 
     receive() external payable {}
 
     function deposit() external payable {
-        require(bal >= 1);
         deopsitFundInterface.deposit{value: 1 ether}();
     }
 }
@@ -44,7 +42,7 @@ contract Attack {
     DepositFunds public deopsitFundInterface;
     uint8 public bal;
 
-    constructor(address _depositFundsAddress) {
+    constructor(address payable _depositFundsAddress) {
         deopsitFundInterface = DepositFunds(_depositFundsAddress);
     }
 
