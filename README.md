@@ -5,7 +5,7 @@ We design a contract with simple deposit and withdraw functions and a user contr
 ```mermaid
 classDiagram
     class Bank {
-        -mapping(address->uint) balance
+        -mapping balance
         +deposit()
         +withdraw()
     }
@@ -19,8 +19,8 @@ classDiagram
         +deposit()
         +withdraw()
     }
-    Bank *-- User
-    Bank *-- Attacker
+    User *-- Bank
+    Attacker *-- Bank
 ```
 
 
@@ -32,10 +32,10 @@ In the normal case, user can deposit and withdraw money from the bank contract.
 sequenceDiagram
     participant User
     participant Bank
-    User->>Bank: deposit()
-    Bank->>User: deposit()
+    User->>Bank: deposit 1 ehter
     User->>Bank: withdraw()
-    Bank->>User: withdraw()
+    Bank->>Bank: Check User's balance > 0
+    Bank->>User: Send ether
 ```
 
 ## Reentrancy Attack
@@ -46,12 +46,14 @@ However in an reentrancy attack, the attacker hide its withdraw function and cal
 sequenceDiagram
     participant Bank
     participant Attacker
-    User->>Attacker: deposit()
-    Attacker->>Bank: deposit()
-    Bank->>Attacker: deposit()
-    Attacker->>Bank: withdraw()
-    Bank->>Attacker: withdraw()
-    Attacker->>Bank: withdraw()
+    Attacker->>Bank: deposit 1 ether
+    Bank->>Attacker: Send ether, trigger fallback function
+    Attacker->>Bank: fallback(withdraw)
+    loop
+        Bank->>Bank: Check Attacker's balance > 0
+        Bank->>Attacker: Send ether, trigger fallback function
+        Attacker->>Bank: fallback(withdraw)
+    end
 ```
 
 ## Defense
@@ -71,13 +73,64 @@ During the re-call of the withdraw function, the mutex lock will prevent the wit
 
 ```mermaid
 sequenceDiagram
-    participant Bank
+ participant Bank
     participant Attacker
-    User->>Attacker: deposit()
-    Attacker->>Bank: deposit()
-    Bank->>Attacker: deposit()
-    Attacker->>Bank: withdraw()
-    Bank->>Attacker: withdraw()
-    Attacker->>Bank: withdraw()
-    Bank->>Attacker: withdraw()
+    Attacker->>Bank: deposit 1 ether
+    Bank->>Attacker: Send ether, trigger fallback function
+    Attacker->>Bank: fallback(withdraw)
+    Bank->>Bank: Check Attacker's balance > 0
+    Bank->>Bank: Lock withdraw function
+    Bank->>Attacker: Send ether, trigger fallback function
+    Attacker->>Bank: fallback(withdraw)
+    Break when the mutex lock is true
+        Bank->>Attacker: Revert
+    end
+```
+
+
+## Drawbacks of mutex lock
+
+Since the lock is a modifier, if we have one hundred methods in the Bank, we have to add lock to all of them. It is a tedious work. Moreover, if we forget to add lock to one of the methods, the contract is still vulnerable to reentrancy attack. Therefore, we need a better solution to prevent reentrancy attack.
+
+## Proxy contract
+
+Proxy contract is a common design pattern in smart contract. The proxy contract is a contract that can delegate its function calls to another contract. The proxy contract is a contract that can delegate its function calls to another contract. The proxy contract has a fallback function to delegate function calls to another contract. The proxy contract can be used to upgrade the contract without changing the address of the contract. The proxy contract can also be used to prevent reentrancy attack.
+
+```mermaid
+classDiagram
+    class BankProxy {
+        -address Bank
+    }
+    class Bank {
+        -mapping balance
+        +deposit()
+        +withdraw()
+    }
+    class User {
+        -address BankProxy
+        +deposit()
+        +withdraw()
+    }
+    class Attacker {
+        -address BankProxy
+        +deposit()
+        +withdraw()
+    }
+    User *-- BankProxy
+    Attacker *-- BankProxy
+    BankProxy *-- Bank
+```
+
+If we add lock on the Proxy contract, the Bank contract will not be vulnerable to reentrancy attack.
+
+```mermaid
+sequenceDiagram
+    participant User
+    participant Bank
+    participant BankProxy
+    User->>BankProxy: deposit 1 ehter
+    BankProxy->>Bank: deposit function call
+    User->>BankProxy: withdraw()
+    BankProxy->>Bank: withdraw function call
+    Bank->>User: Send ether
 ```
