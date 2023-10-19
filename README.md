@@ -121,16 +121,31 @@ classDiagram
     BankProxy *-- Bank
 ```
 
-If we add lock on the Proxy contract, the Bank contract will not be vulnerable to reentrancy attack.
-
 ```mermaid
 sequenceDiagram
     participant User
-    participant Bank
     participant BankProxy
+    participant Bank
     User->>BankProxy: deposit 1 ehter
     BankProxy->>Bank: deposit function call
     User->>BankProxy: withdraw()
     BankProxy->>Bank: withdraw function call
     Bank->>User: Send ether
+```
+
+So we can directly call the deposit and withdraw functions of the bank contract in the proxy contract. The proxy contract can prevent reentrancy attack by setting a mutex lock.
+
+```mermaid
+sequenceDiagram
+    participant User
+    participant BankProxy
+    participant Bank
+    User->>BankProxy: deposit 1 ehter
+    BankProxy->>Bank: deposit function call
+    User->>BankProxy: withdraw()
+    BankProxy->>BankProxy: Check mutex lock
+    BankProxy->>BankProxy: Lock all function call to Bank
+    BankProxy->>Bank: withdraw function call
+    Bank->>User: Send ether
+    BankProxy->>BankProxy: Unlock all function call to Bank
 ```
