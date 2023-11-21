@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: MIT
-pragma solidity ^0.8.21;
-import "https://github.com/spherex-xyz/reentrancy-guard-proxy/blob/main/src/ReentrancyGuardTransparentUpgradeableProxy.sol";
+pragma solidity ^0.8.0;
+import "./ReentrancyGuardTransparentUpgradeableProxy.sol";
 
 contract DepositFunds {
     mapping(address => uint256) public balances;
