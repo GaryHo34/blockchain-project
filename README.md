@@ -7,7 +7,7 @@ Written in Solidity and tested using Hardhat.
 
 | Name | Version                                 |
 | ---- | --------------------------------------- |
-| OS   | Ubuntu or MaxOS                         |
+| OS   | Linux or MaxOS                          |
 | Node | v16.0.0 or higher (not support v21 yet) |
 | yarn | v1.22.10 or higher                      |
 
@@ -25,6 +25,23 @@ We write a simple script to demonstrate the reentrancy attack and defense.
 
 ```bash
 bash demo.sh
+```
+
+You can also manually run the test for each type of reentrancy guard.
+Pass the guard name as an environment variable to the script or run the script directly and no guard will be used.
+
+the available guards are [ReentrancyGuard, BalanceGuard, ProxyGuard]
+
+- for single function reentrancy attack
+
+```bash
+REENTRANCY_GUARD=<guard> npx hardhat run scripts/singleFunctionReentrancyAttack.js
+```
+
+- for cross function reentrancy attack
+
+```bash
+REENTRANCY_GUARD=<guard> npx hardhat run scripts/crossFunctionReentrancyAttack.js
 ```
 
 ## Contract design
