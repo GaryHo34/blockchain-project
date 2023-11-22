@@ -2,9 +2,9 @@
 pragma solidity ^0.8.0;
 
 contract EtherBankWithoutGuard {
-    constructor() payable {}
-
     mapping(address => uint256) private _userBalances;
+
+    constructor() payable {}
 
     function deposit() external payable {
         _userBalances[msg.sender] += msg.value;
@@ -33,4 +33,8 @@ contract EtherBankWithoutGuard {
     function getUserBalance(address _user) public view returns (uint256) {
         return _userBalances[_user];
     }
+
+    receive() external payable {}
+
+    fallback() external payable {}
 }

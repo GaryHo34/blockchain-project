@@ -12,7 +12,7 @@ import "./StaticStorageSlotReentrancyGuard.sol";
  * @dev This contract implements the same interface as OZ TransparentUpgradeableProxy
  *      It adds a reentrancy check before calling the implementation
  */
-contract ReentrancyGuardTransparentUpgradeableProxy is
+contract ReentrancyGuardProxy is
     TransparentUpgradeableProxy,
     StaticStorageSlotReentrancyGuard
 {

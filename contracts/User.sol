@@ -13,10 +13,25 @@ contract User {
         etherBank = IEtherBank(_etherBankAddress);
     }
 
-    receive() external payable {}
+    function withdraw() external {
+        etherBank.withdrawAll();
+        console.log(
+            "Account balance: %s, Bank balance: %s",
+            address(this).balance / 1 ether,
+            etherBank.getBalance() / 1 ether
+        );
+    }
+
+    receive() external payable {
+        console.log("User received: %s", address(this).balance / 1 ether);
+    }
 
     function deposit() external payable {
         etherBank.deposit{value: 1 ether}();
-        console.log("User balance: %s", address(this).balance/1 ether);
+        console.log(
+            "Account balance: %s, Bank balance: %s",
+            address(this).balance / 1 ether,
+            etherBank.getBalance() / 1 ether
+        );
     }
 }
