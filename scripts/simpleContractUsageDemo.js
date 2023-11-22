@@ -9,7 +9,7 @@ async function main() {
 
   await userContract.waitForDeployment();
 
-  const bankContract = await hre.ethers.deployContract("EtherBankWithBalanceGuard");
+  const bankContract = await hre.ethers.deployContract("EtherBankWithReentrancyGuard");
 
   await bankContract.waitForDeployment();
 

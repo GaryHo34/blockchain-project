@@ -13,7 +13,6 @@ const bankContractFactory = async () => {
     case "ReentrancyGuard":
       contractName = "EtherBankWithReentrancyGuard";
       break;
-    case "ProxyGuard":
     default:
       contractName = "EtherBankWithoutGuard";
       break;
