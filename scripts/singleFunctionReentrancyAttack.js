@@ -25,7 +25,7 @@ const bankContractFactory = async () => {
 
 async function main() {
   const bank = await bankContractFactory();
-  
+
   await bank.waitForDeployment();
 
   let bankAddress = await bank.getAddress();
@@ -44,7 +44,7 @@ async function main() {
     bankAddress = await proxy.getAddress();
   }
 
-  const attacker = await hre.ethers.deployContract("Attacker", {
+  const attacker = await hre.ethers.deployContract("SingleFunctionAttacker", {
     value: INIT_BALANCE,
   });
 
@@ -52,7 +52,7 @@ async function main() {
 
   await attacker.setEtherBankAddress(bankAddress);
 
-  await attacker.attack();
+  await attacker.singleFunctionAttack();
 }
 
 // We recommend this pattern to be able to use async/await everywhere

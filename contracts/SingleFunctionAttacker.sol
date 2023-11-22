@@ -4,8 +4,8 @@ pragma solidity ^0.8.0;
 import "./EtherBank.interface.sol";
 import "hardhat/console.sol";
 
-contract Attacker {
-    IEtherBank public etherBank;
+contract SingleFunctionAttacker {
+    IEtherBank private etherBank;
 
     constructor() payable {}
 
@@ -22,7 +22,7 @@ contract Attacker {
         }
     }
 
-    function attack() external payable {
+    function singleFunctionAttack() external payable {
         etherBank.deposit{value: 1 ether}();
         console.log(
             "Attacker's balance: %s\n",

@@ -5,7 +5,6 @@ contract EtherBankWithBalanceGuard {
     uint256 private _participantsLiquitidy;
     uint256 private _beforeOperation;
     uint256 private _afterOperation;
-
     mapping(address => uint256) private _userBalances;
     bool private mutex;
 

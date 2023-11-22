@@ -18,10 +18,7 @@ contract EtherBankWithReentrancyGuard {
         _userBalances[msg.sender] += msg.value;
     }
 
-    function transfer(
-        address receiver,
-        uint256 _amount
-    ) external reentrancyGuard {
+    function transfer(address receiver, uint256 _amount) external {
         require(_userBalances[msg.sender] >= _amount, "Insufficient balance.");
         _userBalances[receiver] += _amount;
         _userBalances[msg.sender] -= _amount;

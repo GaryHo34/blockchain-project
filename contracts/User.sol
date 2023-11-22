@@ -5,7 +5,7 @@ import "./EtherBank.interface.sol";
 import "hardhat/console.sol";
 
 contract User {
-    IEtherBank public etherBank;
+    IEtherBank private etherBank;
 
     constructor() payable {}
 
