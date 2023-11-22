@@ -1,3 +1,32 @@
+# Blockchain Project
+
+This project is a simple bank contract with reentrancy attack and defense.
+Written in Solidity and tested using Hardhat.
+
+## Prerequisite
+
+| Name | Version                                 |
+| ---- | --------------------------------------- |
+| OS   | Ubuntu or MaxOS                         |
+| Node | v16.0.0 or higher (not support v21 yet) |
+| yarn | v1.22.10 or higher                      |
+
+## Installation
+
+Strongly recommend install all the dependencies using yarn. Npm may cause some problems.
+
+```bash
+yarn install
+```
+
+## Run the demo
+
+We write a simple script to demonstrate the reentrancy attack and defense.
+
+```bash
+bash demo.sh
+```
+
 ## Contract design
 
 We design a contract with simple deposit and withdraw functions and a user contract to interact with the bank contract. on the other hand, an attacker contract is designed to attack the bank contract.
@@ -22,7 +51,6 @@ classDiagram
     User *-- Bank
     Attacker *-- Bank
 ```
-
 
 ## Normal case
 
@@ -86,7 +114,6 @@ sequenceDiagram
         Bank->>Attacker: Revert
     end
 ```
-
 
 ## Drawbacks of mutex lock
 
