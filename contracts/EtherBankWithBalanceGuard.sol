@@ -12,7 +12,7 @@ contract EtherBankWithBalanceGuard {
     modifier balanceGuard() {
         require(
             this.getBalance() == this.getParticipantsLiqudity(),
-            "Insufficient liquidity."
+            "Balance Guard: Insufficient liquidity."
         );
         _;
     }

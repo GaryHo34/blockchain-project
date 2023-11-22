@@ -9,7 +9,7 @@ async function main() {
 
   await userContract.waitForDeployment();
 
-  const bankContract = await hre.ethers.deployContract("EtherBankWithoutGuard");
+  const bankContract = await hre.ethers.deployContract("EtherBankWithBalanceGuard");
 
   await bankContract.waitForDeployment();
 
@@ -18,6 +18,8 @@ async function main() {
   await userContract.setEtherBankAddress(bankAddress);
 
   await userContract.deposit();
+
+  await userContract.withdraw();
 }
 
 // We recommend this pattern to be able to use async/await everywhere
