@@ -5,11 +5,11 @@ Written in Solidity and tested using Hardhat.
 
 ## Prerequisite
 
-| Name | Version                                 |
-| ---- | --------------------------------------- |
-| OS   | Linux or MaxOS                          |
-| Node | v16.0.0 or higher (not support v21 yet) |
-| yarn | v1.22.10 or higher                      |
+| Name | Version            |
+| ---- | ------------------ |
+| OS   | Linux / MaxOS      |
+| node | v16 to v20         |
+| yarn | v1.22.10 or higher |
 
 ## Installation
 
@@ -53,7 +53,10 @@ classDiagram
     class Bank {
         -mapping balance
         +deposit()
-        +withdraw()
+        +transfer()
+        +withdrawAll()
+        +getBalance()
+        +getUserBalance()
     }
     class User {
         -address bank
@@ -64,6 +67,7 @@ classDiagram
         -address bank
         +deposit()
         +withdraw()
+        +attack()
     }
     User *-- Bank
     Attacker *-- Bank
@@ -91,13 +95,11 @@ However in an reentrancy attack, the attacker hide its withdraw function and cal
 sequenceDiagram
     participant Bank
     participant Attacker
-    Attacker->>Bank: deposit 1 ether
-    Bank->>Attacker: Send ether, trigger fallback function
-    Attacker->>Bank: fallback(withdraw)
+    Attacker->>Bank: invoke withdraw function
     loop
         Bank->>Bank: Check Attacker's balance > 0
         Bank->>Attacker: Send ether, trigger fallback function
-        Attacker->>Bank: fallback(withdraw)
+        Attacker->>Bank: fallback function call withdraw function again
     end
 ```
 
@@ -120,13 +122,10 @@ During the re-call of the withdraw function, the mutex lock will prevent the wit
 sequenceDiagram
  participant Bank
     participant Attacker
-    Attacker->>Bank: deposit 1 ether
-    Bank->>Attacker: Send ether, trigger fallback function
-    Attacker->>Bank: fallback(withdraw)
-    Bank->>Bank: Check Attacker's balance > 0
+    Attacker->>Bank: invoke withdraw function
     Bank->>Bank: Lock withdraw function
     Bank->>Attacker: Send ether, trigger fallback function
-    Attacker->>Bank: fallback(withdraw)
+    Attacker->>Bank: fallback function call withdraw function again
     Break when the mutex lock is true
         Bank->>Attacker: Revert
     end
@@ -148,7 +147,10 @@ classDiagram
     class Bank {
         -mapping balance
         +deposit()
-        +withdraw()
+        +transfer()
+        +withdrawAll()
+        +getBalance()
+        +getUserBalance()
     }
     class User {
         -address BankProxy
@@ -159,6 +161,7 @@ classDiagram
         -address BankProxy
         +deposit()
         +withdraw()
+        +attack()
     }
     User *-- BankProxy
     Attacker *-- BankProxy
@@ -181,15 +184,35 @@ So we can directly call the deposit and withdraw functions of the bank contract 
 
 ```mermaid
 sequenceDiagram
-    participant User
+    participant Attacker
     participant BankProxy
     participant Bank
-    User->>BankProxy: deposit 1 ehter
-    BankProxy->>Bank: deposit function call
-    User->>BankProxy: withdraw()
-    BankProxy->>BankProxy: Check mutex lock
+    Attacker->>BankProxy: invoke withdraw function
     BankProxy->>BankProxy: Lock all function call to Bank
-    BankProxy->>Bank: withdraw function call
-    Bank->>User: Send ether
-    BankProxy->>BankProxy: Unlock all function call to Bank
+    BankProxy->>Bank: invoke withdraw function
+    Bank->>Attacker: Send ether, trigger fallback function
+    Attacker->>BankProxy: fallback function call withdraw function again
+    Break when the mutex lock is true
+        BankProxy->>Attacker: Revert
+    end
+```
+
+## Cross Function Reentrancy Attack
+In cross function reentrancy attack, the attacker will attack the contract with its accomplice. They invoke withdraw and transfer function of the bank contract alternatively. The withdraw function will be done for each withdraw call, because the function being attacked is different from the function being called. The attacker can withdraw money from the bank contract infinitely.
+
+```mermaid
+sequenceDiagram
+    participant Attacker
+    participant Accomplice
+    participant BankWithReentrancyGuard
+    Attacker->>BankWithReentrancyGuard: invoke withdraw function
+    loop
+        BankWithReentrancyGuard->>BankWithReentrancyGuard: Lock the withdraw function
+        BankWithReentrancyGuard->>Attacker: Send ether, trigger receive function
+        Attacker->>BankWithReentrancyGuard: invoke transfer function, transfer money to Accomplice
+        BankWithReentrancyGuard->>BankWithReentrancyGuard: transfer money to Accomplice's balance
+        BankWithReentrancyGuard->>BankWithReentrancyGuard: Update Attackers's balance
+        BankWithReentrancyGuard->>BankWithReentrancyGuard: Unlock the withdraw function
+        Accomplice->>BankWithReentrancyGuard: invoke withdraw function again
+    end
 ```
