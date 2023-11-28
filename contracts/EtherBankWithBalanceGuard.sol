@@ -2,7 +2,7 @@
 pragma solidity ^0.8.0;
 
 contract EtherBankWithBalanceGuard {
-    uint256 private _participantsLiquitidy;
+    uint256 private _participantsLiquidity;
     uint256 private _beforeOperation;
     uint256 private _afterOperation;
     mapping(address => uint256) private _userBalances;
@@ -17,7 +17,7 @@ contract EtherBankWithBalanceGuard {
     }
 
     constructor() payable {
-        _participantsLiquitidy = address(this).balance;
+        _participantsLiquidity = address(this).balance;
         _beforeOperation = 0;
         _afterOperation = 0;
     }
@@ -26,7 +26,7 @@ contract EtherBankWithBalanceGuard {
         require(msg.value > 0, "Value must be greater than 0.");
         _userBalances[msg.sender] += msg.value;
         _afterOperation = this.getBalance() - _beforeOperation; // the increment of the contract balance
-        _participantsLiquitidy += _afterOperation; // the increment is added to the participants liquidity
+        _participantsLiquidity += _afterOperation; // the increment is added to the participants liquidity
         _beforeOperation = this.getBalance(); // the balance before the operation is updated
         _afterOperation = 0;
     }
@@ -44,7 +44,7 @@ contract EtherBankWithBalanceGuard {
         (bool sent, ) = msg.sender.call{value: balance}("");
         require(sent, "Failed to send Ether");
         _userBalances[msg.sender] = 0;
-        _participantsLiquitidy -= balance;
+        _participantsLiquidity -= balance;
     }
 
     function getBalance() external view returns (uint256) {
@@ -52,7 +52,7 @@ contract EtherBankWithBalanceGuard {
     }
 
     function getParticipantsLiqudity() external view returns (uint256) {
-        return _participantsLiquitidy;
+        return _participantsLiquidity;
     }
 
     function getUserBalance(address _user) external view returns (uint256) {
