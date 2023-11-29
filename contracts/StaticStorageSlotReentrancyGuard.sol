@@ -1,5 +1,10 @@
 // SPDX-License-Identifier: MIT
 
+// This is SphereX's StaticStorageSlotReentrancyGuard contract
+// Original source:
+// https://github.com/spherex-xyz/reentrancy-guard-proxy/blob/main/src/StaticStorageSlotReentrancyGuard.sol
+
+
 pragma solidity ^0.8.0;
 
 import "@openzeppelin/contracts/utils/StorageSlot.sol";
