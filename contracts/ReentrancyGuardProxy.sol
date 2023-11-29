@@ -46,4 +46,6 @@ contract ReentrancyGuardProxy is
             return(add(ret_data, 0x20), ret_size)
         }
     }
+
+    receive() external payable {}
 }

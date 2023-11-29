@@ -35,12 +35,7 @@ contract CrossFunctionAttacker {
 
     function attackInit() external payable {
         etherBank.deposit{value: 1 ether}();
-        console.log(
-            "Attacker's balance: %s\n",
-            address(this).balance / 1 ether
-        );
-        etherBank.withdrawAll();
-        accomplice.attack();
+        this.attack();
     }
 
     function attack() external payable {

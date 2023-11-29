@@ -57,7 +57,7 @@ abstract contract StaticStorageSlotReentrancyGuard {
      * @dev only checks if the flag is on. prevents read only reentrancy
      */
     modifier nonReentrantStatic() {
-        require(_getReentrancyStatus() != _ENTERED, "ReentrancyGuard: reentrant static call");
+        require(_getReentrancyStatus() != _ENTERED, "Proxy Guard: Reentrant is not allowed.");
         _;
     }
 
@@ -75,7 +75,7 @@ abstract contract StaticStorageSlotReentrancyGuard {
 
     function _nonReentrantBefore() private returns (bool) {
         // On the first call to nonReentrant, _status will be _NOT_ENTERED
-        require(_getReentrancyStatus() != _ENTERED, "ReentrancyGuard: reentrant call");
+        require(_getReentrancyStatus() != _ENTERED, "Proxy Guard: Reentrant is not allowed.");
 
         // Any calls to nonReentrant after this point will fail
 

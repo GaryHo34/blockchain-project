@@ -19,9 +19,21 @@ contract EtherBankWithoutGuard {
     function withdrawAll() external {
         uint256 balance = _userBalances[msg.sender];
         require(balance > 0, "Insufficient balance.");
+        (bool success, bytes memory returndata) = msg.sender.call{
+            value: balance
+        }("");
 
-        (bool sent, ) = msg.sender.call{value: balance}("");
-        require(sent, "Failed to send Ether");
+        if (!success) {
+            if (returndata.length > 0) {
+                // The easiest way to bubble the revert reason is using memory via assembly
+                assembly {
+                    let returndata_size := mload(returndata)
+                    revert(add(32, returndata), returndata_size)
+                }
+            } else {
+                revert("Failed to send Ether");
+            }
+        }
 
         _userBalances[msg.sender] = 0;
     }
